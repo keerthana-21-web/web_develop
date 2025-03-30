@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Programming Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        #chatContainer {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        #chatMessages {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .user-message {
+            background-color: #e6f2ff;
+            text-align: right;
+        }
+        .bot-message {
+            background-color: #f0f0f0;
+            text-align: left;
+        }
+        #otpVerification, #chatInput {
+            display: none;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="chatContainer">
+        <div id="chatMessages"></div>
+        
+        <div id="initialScreen">
+            <button onclick="showOTPScreen()">Start Chatbot</button>
+        </div>
+        
+        <div id="otpVerification" style="display:none;">
+            <h3>OTP Verification</h3>
+            <input type="text" id="otpInput" placeholder="Enter 6-digit OTP">
+            <button onclick="verifyOTP()">Verify OTP</button>
+        </div>
+        
+        <div id="chatInput" style="display:none;">
+            <input type="text" id="messageInput" placeholder="Ask your programming question">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        const otpVerification = document.getElementById('otpVerification');
+        const chatInput = document.getElementById('chatInput');
+        const messageInput = document.getElementById('messageInput');
+        const otpInput = document.getElementById('otpInput');
+
+        let generatedOTP = '';
+
+        function showOTPScreen() {
+            generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+            otpVerification.style.display = 'block';
+            document.getElementById('initialScreen').style.display = 'none';
+            addBotMessage(`Your OTP is: ${generatedOTP}`);
+        }
+
+        function verifyOTP() {
+            const userOTP = otpInput.value;
+            if (userOTP === generatedOTP) {
+                otpVerification.style.display = 'none';
+                chatInput.style.display = 'block';
+                addBotMessage('OTP Verified! You can now ask programming questions.');
+            } else {
+                addBotMessage('Incorrect OTP. Please try again.');
+            }
+        }
+
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (message) {
+                addUserMessage(message);
+                processMessage(message);
+                messageInput.value = '';
+            }
+        }
+
+        function processMessage(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            // Java question handling
+            if (lowerMessage.includes('java')) {
+                addBotMessage('I will not answer Java questions.');
+                return;
+            }
+
+            // Programming language responses
+            const responses = {
+                'python': 'Python is a versatile programming language known for its readability and wide usage.',
+                'javascript': 'JavaScript is a popular language for web development, enabling interactive web pages.',
+                'c++': 'C++ is a powerful programming language used for system/software development and game programming.',
+                'react': 'React is a JavaScript library for building user interfaces, particularly single-page applications.',
+                'algorithm': 'Algorithms are step-by-step procedures for solving computational problems.',
+                'data structure': 'Data structures are ways of organizing and storing data for efficient access and modification.'
+            };
+
+            // Check for keyword match
+            for (let [keyword, response] of Object.entries(responses)) {
+                if (lowerMessage.includes(keyword)) {
+                    addBotMessage(response);
+                    return;
+                }
+            }
+
+            // Default response
+            addBotMessage('I can help with programming questions. Try asking about Python, JavaScript, algorithms, or data structures!');
+        }
+
+        function addUserMessage(message) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', 'user-message');
+            messageElement.textContent = message;
+            chatMessages.appendChild(messageElement);
+            scrollToBottom();
+        }
+
+        function addBotMessage(message) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', 'bot-message');
+            messageElement.textContent = message;
+            chatMessages.appendChild(messageElement);
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    </script>
+</body>
+</html>
